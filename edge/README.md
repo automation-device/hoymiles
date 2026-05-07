@@ -1,110 +1,182 @@
-<!-- These are examples of badges you might want to add to your README:
-     please update the URLs accordingly
+# Hoymiles Solar Data Gateway - Edge Add-on
 
-[![Built Status](https://api.cirrus-ci.com/github/<USER>/hoymiles.svg?branch=main)](https://cirrus-ci.com/github/<USER>/hoymiles)
-[![ReadTheDocs](https://readthedocs.org/projects/hoymiles/badge/?version=latest)](https://hoymiles.readthedocs.io/en/stable/)
-[![Coveralls](https://img.shields.io/coveralls/github/<USER>/hoymiles/main.svg)](https://coveralls.io/r/<USER>/hoymiles)
-[![PyPI-Server](https://img.shields.io/pypi/v/hoymiles.svg)](https://pypi.org/project/hoymiles/)
-[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/hoymiles.svg)](https://anaconda.org/conda-forge/hoymiles)
-[![Monthly Downloads](https://pepy.tech/badge/hoymiles/month)](https://pepy.tech/project/hoymiles)
-[![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/hoymiles)
--->
+This add-on connects your Hoymiles cloud plant to Home Assistant through MQTT.
 
-[![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
+Important notes:
 
+- Edge is a development branch and may be less stable than the stable version.
+- The integration uses an unofficial API and can break when cloud behavior changes.
 
-# HoyMiles Solar Data Gateway Add-on Edge version
+## Who This Is For
 
-# Branch in full full development mode - will be rewritten from scratch
+This README is for Home Assistant end users who want to:
 
-## Important Info
+- install the add-on,
+- configure login, plant, and MQTT settings,
+- understand what each option does and when to use it.
 
-Addon is in maintenance mode. This is FOSS (Free Open Source Software) and based on reverse engineering so it could not work always as expected. What is more due to techical dept present implementation loose possibility to add new features. This mean that it **required rewriting from scratch**. Without support from community it **is not predicted soon**.
+Developer and project-internal documents were moved to the doc directory.
 
-Br,
-Cosik.
+## Install In Home Assistant
 
-## Info
+1. Open Home Assistant.
+2. Go to Settings -> Add-ons -> Add-on Store.
+3. Add this repository URL:
+   [https://github.com/dmslabsbr/hoymiles]
+4. Install Hoymiles Solar Data Gateway Edge.
+5. Configure options (see full option guide below).
+6. Start the add-on.
+7. Check Log output for successful login, data polling, and MQTT publishing.
 
-Development versions can be unstable.
+## Quick Start Configuration
 
-Application to read Hoymiles Gateway Solar Data using unofficial API
+Fill at least these fields first:
 
-I developed this program to integrate my solar system data to [Home Assistant](https://www.home-assistant.io/) Application through an add-on.
+- HOYMILES_USER
+- HOYMILES_PASSWORD
+- HOYMILES_PLANT_ID
 
-Now, [Cosik](https://github.com/Cosik)  is helping too.
+Then choose MQTT mode:
 
-[![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fdmslabsbr%2Fhoymiles)
+- Internal Home Assistant MQTT: keep External_MQTT_Server as false.
+- External MQTT broker: set External_MQTT_Server to true and fill MQTT_Host, MQTT_User, MQTT_Pass (and TLS settings if needed).
 
-But you can use the application without using the Home Assistant. You just need a machine that runs Python3. It based on mqtt messages, so could be send from any device to MQTT Broker.
+## Full Option Reference
 
+Source of truth: config.json options/schema in this add-on.
 
-Donate Cosik ->
-[![Donate Cosik](https://img.shields.io/badge/Donate-PayPal-green.svg)](paypal.me/cosik3d)
+### Required Cloud Access
 
-<img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/dmslabsbr/hoymiles">
-<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/dmslabsbr/hoymiles">
+- HOYMILES_USER
+  - What it does: Hoymiles account username/email used to authenticate.
+  - Use when: always required.
 
+- HOYMILES_PASSWORD
+  - What it does: Hoymiles account password.
+  - Use when: always required.
 
-# Instructions
+- HOYMILES_PLANT_ID
+  - What it does: plant/site identifier used for data queries.
+  - Use when: always required.
 
-<img align="center" src="https://github.com/dmslabsbr/smsUps/raw/master/hass.io.png" alt="" width="30" /> [Home Assistant add-on instructions](DOCS.md)
+### Cloud/API Compatibility
 
+- USE_ESTAR
+  - What it does: enables ESTAR compatibility mode.
+  - Use when: your account/environment requires ESTAR-specific behavior.
 
-Before run you need to install:
-   https://github.com/eclipse/paho.mqtt.python  ***and***
-   https://github.com/psf/requests
+- EXPERIMENTAL_CUSTOM_API_URLS
+  - What it does: allows custom cloud API endpoints.
+  - Use when: only for advanced compatibility troubleshooting or non-default regional endpoints.
 
+- API_GATEWAY_BASE_URL
+  - What it does: custom base URL for gateway-style endpoints.
+  - Use when: EXPERIMENTAL_CUSTOM_API_URLS is true and you need a custom gateway host.
 
-```bash
-git clone https://github.com/dmslabsbr/hoymiles.git
-cd hoymiles
-python3 -m venv ./hoymiles/
-source ./bin/activate
-pip3 install paho-mqtt==1.6.1
-pip3 install requests
-pip3 install python-dateutil
-```
+- API_VERSIONED_BASE_URL
+  - What it does: custom base URL for versioned API endpoints.
+  - Use when: EXPERIMENTAL_CUSTOM_API_URLS is true and versioned API host differs.
 
-My solar panels communicate with the internet using a DTU-W100 gateway.
+- API_COOKIE_DOMAIN
+  - What it does: custom cookie domain used during authentication/session handling.
+  - Use when: cookies are scoped to a different domain in your environment.
 
-<img src="https://github.com/dmslabsbr/hoymiles/raw/master/img/icon.png" alt="" width="300" />
+### API Version Debug Controls
 
-But it will probably work with any device that uses the [global.hoymiles.com](https://global.hoymiles.com/) Website. It was tested with DTU-PRO also.
+- DEBUG_FORCE_API_VERSION
+  - What it does: overrides automatic API version selection.
+  - Use when: debugging login/data compatibility only.
 
+- DEBUG_API_VERSION
+  - What it does: forced API version value (0 or 3).
+  - Use when: DEBUG_FORCE_API_VERSION is true and you need to test a specific API path.
 
-# Supported devies
+### MQTT Connection
 
-So far it is confirmed that addon support Hoymiles devices:
-- micro inverters
-- standard inverters
-- energy meters
-- bms (with some restrictions)
-- batteries (with some restrictions)
-- multiple instalattions
+- External_MQTT_Server
+  - What it does: switches between Home Assistant internal MQTT credentials and an external broker.
+  - Use when: set true for external broker, false for Home Assistant internal broker.
 
-## Restrictions
+- MQTT_Host
+  - What it does: hostname/IP of external MQTT broker.
+  - Use when: External_MQTT_Server is true.
 
-Addon support batteries and bms. Present is support only two modes:
-- self consumption
-- force charge
+- MQTT_User
+  - What it does: username for external MQTT broker authentication.
+  - Use when: External_MQTT_Server is true and broker requires auth.
 
-Due to technical dept there **is no feedback about enabled mode and set values.**
+- MQTT_Pass
+  - What it does: password for external MQTT broker authentication.
+  - Use when: External_MQTT_Server is true and broker requires auth.
 
+- MQTT_TLS
+  - What it does: enables TLS for MQTT connection.
+  - Use when: broker requires encrypted MQTT.
 
-## PS:
-I invite everyone to help in the this tool development.
+- MQTT_TLS_PORT
+  - What it does: TLS port used for MQTT (default 8883).
+  - Use when: MQTT_TLS is true or broker uses a non-standard secure port.
 
-## Screenshots
+### Home Assistant Discovery Topics
 
-<img src="https://github.com/dmslabsbr/hoymiles/blob/master/edge/img/Hass1.png?raw=true" alt="" width="400" />
+- MQTT_DISCOVERY_PREFIX
+  - What it does: Home Assistant MQTT discovery root topic (default homeassistant).
+  - Use when: you use a custom discovery prefix.
 
-<img src="https://github.com/dmslabsbr/hoymiles/blob/master/edge/img/Hass2.png?raw=true" alt="" width="400" />
+- MQTT_NODE_ID
+  - What it does: node identifier used in topic/entity naming.
+  - Use when: you run multiple instances or want distinct topic namespaces.
 
-<img src="https://github.com/dmslabsbr/hoymiles/blob/master/edge/img/Hass3.png?raw=true" alt="" width="400" />
+### Data and Availability Timing
 
+- HA_EXPIRE_TIME
+  - What it does: Home Assistant entity expire_after value (seconds).
+  - Use when: tuning how quickly entities become unavailable if updates stop.
 
+- GET_DATA_INTERVAL
+  - What it does: interval between cloud data fetches (seconds).
+  - Use when: balancing data freshness vs API load.
 
-#### Licence
+- HASS_INTERVAL
+  - What it does: interval for Home Assistant publication/update loop (seconds).
+  - Use when: tuning entity update cadence.
 
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+- Auto_update_token
+  - What it does: enables periodic token refresh.
+  - Use when: sessions expire in your environment and you want proactive token renewal.
+
+### Troubleshooting and Logging
+
+- DEVELOPERS_MODE
+  - What it does: enables additional developer/debug behavior.
+  - Use when: troubleshooting only.
+
+- LOG_LEVEL
+  - What it does: controls verbosity of logs.
+  - Allowed values: DEBUG, INFO, WARNING, ERROR, CRITICAL.
+  - Use when: set DEBUG for diagnostics, INFO for normal use.
+
+## Recommended Safe Defaults
+
+For most users:
+- Keep EXPERIMENTAL_CUSTOM_API_URLS as false.
+- Keep DEBUG_FORCE_API_VERSION as false.
+- Keep DEVELOPERS_MODE as false.
+- Use INFO log level.
+
+## Troubleshooting Basics
+
+- Login errors:
+  - verify HOYMILES_USER/HOYMILES_PASSWORD,
+  - verify your plant ID.
+- No entities in Home Assistant:
+  - verify MQTT connectivity,
+  - verify discovery prefix and node id,
+  - review add-on logs.
+- Intermittent cloud/API issues:
+  - enable Auto_update_token,
+  - use DEBUG_FORCE_API_VERSION only for temporary diagnostics.
+
+## Additional Documentation
+
+Technical and project/internal markdown files are in the doc directory.

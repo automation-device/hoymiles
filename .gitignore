@@ -144,4 +144,6 @@ comm.json
 
 my.json
 
-.vscode/
+.vscode/*
+edge/local_run.sh
+*.xml
